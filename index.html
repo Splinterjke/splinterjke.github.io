@@ -29,12 +29,16 @@
             const { timeout = 1000 } = options;
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
-            const response = await fetch(resource, {
-                ...options,
-                signal: controller.signal
-            });
-            clearTimeout(id);
-            return response;
+            try {
+                const response = await fetch(resource, {
+                    ...options,
+                    signal: controller.signal
+                });
+            }
+            finally {
+                clearTimeout(id);
+                return response;
+            }
         }
         $('#launch-button').click(async function () {
             try {
@@ -43,7 +47,7 @@
                 const response = await fetchWithTimeout("http://localhost:5000/test", {
                     method: "POST",
                     body: value,
-                    timeout: 500
+                    timeout: 750
                 })
             } catch (error) {
                 $("#error").show()
