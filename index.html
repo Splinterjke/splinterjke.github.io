@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0" />
+    <title>UMBRELLA POC</title>
+    <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container">
+        <video type="video/mp4" class="full-image" src="/colors.mp4" autoplay muted loop></video>
+        <h2 class="title">ARE YOU READY?</h2>
+        <input id="text-input" class="text-input" value="TYPE HERE THEN PRESS PLAY" />
+        <div id="launch-button" class="launch-button">
+            <p><span class="bg"></span><span class="base"></span><span class="text">PLAY UMBRELLA</span></p>
+        </div>
+        <div class="error" id="error">
+            <div class="message">Seems like you don't have UMBRELLA launcher running locally</div>
+            <a href="/umbrella_demo.zip" target="blank" class="download-btn">
+                <span>DOWNLOAD</span>
+            </a>
+        </div>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+        async function fetchWithTimeout(resource, options) {
+            const { timeout = 1000 } = options;
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        }
+        $('#launch-button').click(async function () {
+            try {
+                $("#error").hide()
+                const value = $('#text-input').val().trim()
+                const response = await fetchWithTimeout("http://localhost:5000/test", {
+                    method: "POST",
+                    body: value,
+                    timeout: 500
+                })
+            } catch (error) {
+                $("#error").show()
+            }
+        });
+    </script>
+</body>
+
+</html>
